@@ -30,31 +30,7 @@ The core insight: **design for humans and the agent benefits for free.** Readabl
 
 ---
 
-## What makes this different
-
-### Other Spec-Driven Development tools stop too early
-
-Tools like AWS Kiro, Spec Kit, GSD, OpenSpec, and Taskmaster AI all converge on the same workflow: write a spec, decompose into tasks, generate code. That's the easy part.
-
-swe-cmd adds the parts everyone skips:
-
-| What's missing elsewhere | swe-cmd command |
-|---|---|
-| Spec↔test coverage audits with mutation checks | `swe-verify` |
-| Explicit contract change management with archiving | `swe-respec` |
-| Proactive decay detection (README rot, convention drift, stale devlog) | `swe-status` |
-| Structured decision records that survive session boundaries | devlog per feature |
-
-### The BLUE phase catches what RED→GREEN misses
-
-Most TDD workflows do RED → GREEN → refactor. swe-cmd does RED → GREEN → BLUE → REVIEW.
-
-BLUE is where you try to break your own test:
-- **Mutation check.** What change to production code should break this but won't break the test?
-- **False pass check.** Could a hardcoded return value pass this test?
-- **Behavior vs. implementation check.** Would a completely different implementation still pass?
-
-Tests that pass for the wrong reason are worse than no tests. They give you false confidence. BLUE kills them.
+## Key ideas
 
 ### Reading depth prevents blind modifications
 
@@ -68,11 +44,22 @@ Every CLAUDE.md, AGENTS.md, and cursor rules file in the wild is a list of direc
 
 swe-cmd's CONVENTIONS.md template forces you to answer *why*: "Where have errors bitten you before?" "What makes a test brittle in this project?" This produces conventions an agent can reason about, not just obey. A rule without a why is fragile — nobody knows whether breaking it matters.
 
-### The devlog is memory that doesn't evaporate
+### The BLUE phase catches what RED→GREEN misses
 
-Chat history disappears. Task lists get stale. swe-cmd writes a devlog entry per behavior, per phase — with commit hashes, decisions made, conventions diverged from, and blind spots flagged.
+TDD's standard loop is RED (write a failing test) → GREEN (make it pass) → refactor. swe-cmd extends it: RED → GREEN → BLUE → REVIEW.
 
-Start a new session six months later, read the devlog, and you know exactly where things stand and why they're shaped that way. No embeddings required.
+BLUE is where you try to break your own test:
+- **Mutation check.** What change to production code should break this but won't break the test?
+- **False pass check.** Could a hardcoded return value pass this test?
+- **Behavior vs. implementation check.** Would a completely different implementation still pass?
+
+Tests that pass for the wrong reason are worse than no tests. They give you false confidence. BLUE kills them.
+
+### The devlog.md is memory that doesn't evaporate
+
+Chat history disappears. Task lists get stale. swe-cmd writes a devlog.md entry per behavior, per phase — with commit hashes, decisions made, conventions diverged from, and blind spots flagged.
+
+Start a new session six months later, read the devlog.md, and you know exactly where things stand and why they're shaped that way. No embeddings required.
 
 ---
 
@@ -80,7 +67,7 @@ Start a new session six months later, read the devlog, and you know exactly wher
 
 swe-cmd optimizes the *process layer* — what the agent does and in what order. It does not optimize the *information layer* — what the agent sees at each step.
 
-The strongest version of this would be swe-cmd's workflow running inside a context-engineered agent that dynamically loads the right spec section, the right devlog entry, and the right conventions based on which behavior is currently being implemented. Instead of the agent manually reading everything, the system serves exactly what's needed.
+The strongest version of this would be swe-cmd's workflow running inside a context-engineered agent that dynamically loads the right spec.md section, the right devlog.md entry, and the right conventions based on which behavior is currently being implemented. Instead of the agent manually reading everything, the system serves exactly what's needed.
 
 That's not built yet. Right now, it's plain markdown files and a disciplined agent. And that still beats a context-optimized agent with no discipline.
 
@@ -91,12 +78,12 @@ That's not built yet. Right now, it's plain markdown files and a disciplined age
 | Command | Purpose |
 |---|---|
 | `/swe-init` | Phase Zero — orient, read the project, establish conventions, create `.swe/` |
-| `/swe-spec` | Interview → behaviors → frozen spec |
-| `/swe-respec` | Supersede or deprecate an existing spec |
+| `/swe-spec` | Interview → behaviors → frozen spec.md |
+| `/swe-respec` | Supersede or deprecate an existing spec.md |
 | `/swe-implement <feature>` | Micro TDD cycle per behavior |
-| `/swe-fix <description>` | Fix a bug with TDD — no spec, test IS the spec |
+| `/swe-fix <description>` | Fix a bug with TDD — no spec.md, test IS the spec.md |
 | `/swe-refactor <description>` | Refactor without altering behavior — existing tests are the safety net |
-| `/swe-verify` | Spec↔test coverage audit |
+| `/swe-verify` | spec.md↔test coverage audit |
 | `/swe-status` | Standalone health audit, run anytime |
 
 ---
@@ -123,9 +110,9 @@ Running `/swe-init` creates a `.swe/` directory:
 
 ```
 /swe-init           # once per project
-/swe-spec           # interview → behaviors → frozen spec
+/swe-spec           # interview → behaviors → frozen spec.md
 /swe-implement      # TDD cycle per behavior (RED → GREEN → BLUE → REVIEW)
-/swe-verify         # spec↔test coverage audit before shipping
+/swe-verify         # spec.md↔test coverage audit before shipping
 /swe-status         # run anytime to catch drift
 ```
 
@@ -182,8 +169,8 @@ Kent Beck gave us TDD, and with it the insight that the order of operations matt
 
 Martin Fowler established refactoring as a discipline separate from feature work. `swe-refactor` exists because of that separation. Changing how code works and changing what it does are different acts; conflating them is where most projects quietly rot.
 
-Fred Brooks warned that process matters more than heroics, and that you should plan to throw one away. The devlog is the antidote to heroics — it makes decisions visible so the next session doesn't have to reconstruct them from first principles.
+Fred Brooks warned that process matters more than heroics, and that you should plan to throw one away. The devlog.md is the antidote to heroics — it makes decisions visible so the next session doesn't have to reconstruct them from first principles.
 
 Edsger Dijkstra showed that constraints are the source of reliability, not the enemy of it. Reading depth levels, frozen specs, and BLUE phase checks are all constraints. They feel slow. They are why this works.
 
-Donald Knuth wrote programs to be read by humans and only incidentally executed by machines. The devlog per behavior, the BDD-phrased spec, the reasoning-first CONVENTIONS.md — all of it is literate programming by another name.
+Donald Knuth wrote programs to be read by humans and only incidentally executed by machines. The devlog.md per behavior, the BDD-phrased spec.md, the reasoning-first CONVENTIONS.md — all of it is literate programming by another name.
